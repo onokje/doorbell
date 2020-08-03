@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "loudness": "^0.3.0",
+    "mqtt": "*",
+    "onoff": "^1.1.9",
+    "speaker": "^0.4.1",
+    "stream-buffers": "^3.0.1",
+    "wav": "^1.0.1"
+  }
+}

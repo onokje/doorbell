@@ -74,31 +74,11 @@ client.on('message', function (topic, message) {
             break;
         case 'commands/doorbell/changering':
             log('Incoming message: change doorbell ring sound');
-            // change sound
-            switch (message.toString()) {
-                case 'asterix':
-                    loadFile('doorbell_asterix.wav');
-                break;
-                case 'fart':
-                    loadFile('doorbell_fart.wav');
-                    break;
-                case 'lounge':
-                    loadFile('doorbell_lounge_gong.wav');
-                    break;
-                case 'starwars':
-                    loadFile('doorbell_starwars.wav');
-                    break;
-                case 'chewbacca':
-                    loadFile('doorbell_chewbacca.wav');
-                    break;
-                case 'tardis':
-                    loadFile('doorbell_tardis.wav');
-                    break;
-                case 'classic':
-                    loadFile('doorbell_classic_fast.wav');
-                    break;
+            try {
+                loadFile(message.toString());
+            } catch (e) {
+                log(`Loading new sound "${message.toString()}" failed`);
             }
-
             break;
         default:
             throw Error('invalid message topic received');

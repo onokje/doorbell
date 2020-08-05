@@ -18,7 +18,7 @@ This is a NodeJS application. So install that first. After NodeJS is installed, 
 
 
 ## How to use:
-By default, the script should play the Asterix sound when the button is pressed. To change this, send a mqtt message to topic: `commands/doorbell/changering` with a payload of any of the following: `asterix`, `fart`, `lounge`, `starwars`, `chewbacca`, `tardis`, `classic`. You can of course add your own sounds, but you need to do a little bit of javascript coding, and the sound files need to be wav files. MP3 or anything else won't work.
+By default, the script should play the Asterix sound when the button is pressed. To change this, send a mqtt message to topic: `commands/doorbell/changering` with a payload of the filename for the sound you want. You can put sound own sounds in the `sounds` folder. The sound files need to be wav files. MP3 or anything else won't work.
 
 When the button is pressed, the application will send a mqtt message to topic `events/doorbellRang` with payload `Doorbell ringing!`.
 

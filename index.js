@@ -32,7 +32,7 @@ client.on('connect', function () {
     log('Mqtt connected');
     client.subscribe([MQTT_TOPIC_TEST, MQTT_TOPIC_CHANGE_RINGTONE], function (err) {
         if (!err) {
-            client.publish(MQTT_TOPIC_ONLINE_STATUS, 'Doorbell online')
+            client.publish(MQTT_TOPIC_ONLINE_STATUS, 'online')
         }
     })
 });

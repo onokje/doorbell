@@ -1,5 +1,14 @@
 require('dotenv').config();
-const {MQTT_URL, MQTT_USERNAME, MQTT_PASSWORD, BUTTON_PIN} = process.env;
+const {
+    MQTT_URL,
+    MQTT_USERNAME,
+    MQTT_PASSWORD,
+    BUTTON_PIN,
+    MQTT_TOPIC_BUTTON_PRESS,
+    MQTT_TOPIC_TEST,
+    MQTT_TOPIC_CHANGE_RINGTONE,
+    MQTT_TOPIC_ONLINE_STATUS
+} = process.env;
 
 const fs = require('fs');
 const wav = require('wav');
@@ -21,9 +30,9 @@ function log(msg) {
 
 client.on('connect', function () {
     log('Mqtt connected');
-    client.subscribe('commands/doorbell/#', function (err) {
+    client.subscribe([MQTT_TOPIC_TEST, MQTT_TOPIC_CHANGE_RINGTONE], function (err) {
         if (!err) {
-            client.publish('events', 'Doorbell online')
+            client.publish(MQTT_TOPIC_ONLINE_STATUS, 'Doorbell online')
         }
     })
 });
@@ -64,7 +73,7 @@ function playSound(wavBuf, callback) {
 
 client.on('message', function (topic, message) {
     switch (topic) {
-        case 'commands/doorbell/test':
+        case MQTT_TOPIC_TEST:
             log('Incoming message: Doorbell test');
             // play sound
             playSound(wavBuffer, () => {
@@ -72,7 +81,7 @@ client.on('message', function (topic, message) {
                 playing = false;
             });
             break;
-        case 'commands/doorbell/changering':
+        case MQTT_TOPIC_CHANGE_RINGTONE:
             log('Incoming message: change doorbell ring sound');
             try {
                 loadFile(message.toString());
@@ -103,7 +112,7 @@ button.watch(function (err, value) {
 
         log("Sending doorbell event...");
 
-        client.publish('events/doorbellRang', 'Doorbell ringing!');
+        client.publish(MQTT_TOPIC_BUTTON_PRESS, 'Doorbell ringing!');
     }
 
 });

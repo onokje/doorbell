@@ -80,6 +80,9 @@ client.on('message', function (topic, message) {
                 console.log('Play sound complete.');
                 playing = false;
             });
+
+            log("Sending doorbell event (test)...");
+            client.publish(MQTT_TOPIC_BUTTON_PRESS, 'Doorbell ringing!');
             break;
         case MQTT_TOPIC_CHANGE_RINGTONE:
             log('Incoming message: change doorbell ring sound');

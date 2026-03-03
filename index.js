@@ -11,6 +11,7 @@ const {
 } = process.env;
 
 const fs = require('fs');
+const path = require('path');
 const wav = require('wav');
 const Speaker = require('speaker');
 const Gpio = require('onoff').Gpio;
@@ -20,12 +21,23 @@ const mqtt = require('mqtt');
 const loudness = require('loudness');
 
 
-const client  = mqtt.connect(MQTT_URL, {username: MQTT_USERNAME, password: MQTT_PASSWORD});
+const mqttOptions = { username: MQTT_USERNAME, password: MQTT_PASSWORD };
+if (process.env.MQTT_CA_CERT) {
+    mqttOptions.ca = fs.readFileSync(process.env.MQTT_CA_CERT);
+    mqttOptions.rejectUnauthorized = true;
+}
+const client = mqtt.connect(MQTT_URL, mqttOptions);
 
 loudness.setVolume(100);
 
 function log(msg) {
     console.log(new Date().toLocaleString(), msg);
+}
+
+function sanitizeFilename(input) {
+    const name = path.basename(input);
+    if (!/^[\w\-]+\.wav$/i.test(name)) throw new Error(`Invalid filename: ${name}`);
+    return name;
 }
 
 client.on('connect', function () {
@@ -43,7 +55,7 @@ let filename = 'doorbell_asterix.wav';
 
 function loadFile(filename){
     fs.readFile(`sounds/${filename}`, function(err, data) {
-        if (err) throw err;
+        if (err) { log(`Failed to load ${filename}: ${err.message}`); return; }
         wavBuffer = data;
         log(`Wave file ${filename} loaded`);
     });
@@ -87,9 +99,9 @@ client.on('message', function (topic, message) {
         case MQTT_TOPIC_CHANGE_RINGTONE:
             log('Incoming message: change doorbell ring sound');
             try {
-                loadFile(message.toString());
+                loadFile(sanitizeFilename(message.toString()));
             } catch (e) {
-                log(`Loading new sound "${message.toString()}" failed`);
+                log(`Loading new sound failed: ${e.message}`);
             }
             break;
         default:
@@ -101,7 +113,8 @@ loadFile(filename);
 
 button.watch(function (err, value) {
     if (err) {
-        throw err;
+        log(`GPIO error: ${err.message}`);
+        return;
     }
 
     if (value === 1 && !playing){
@@ -120,7 +133,12 @@ button.watch(function (err, value) {
 
 });
 
-process.on('SIGINT', function () {
+function shutdown() {
     log('Exiting...');
     button.unexport();
-});
+    client.end();
+    process.exit(0);
+}
+
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);

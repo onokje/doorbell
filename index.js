@@ -14,8 +14,14 @@ const fs = require('fs');
 const path = require('path');
 const wav = require('wav');
 const Speaker = require('speaker');
-const Gpio = require('onoff').Gpio;
-const button = new Gpio(BUTTON_PIN, 'in', 'rising', {debounceTimeout: 10});
+const pigpio = require('pigpio');
+const Gpio = pigpio.Gpio;
+const button = new Gpio(parseInt(BUTTON_PIN, 10), {
+    mode: Gpio.INPUT,
+    pullUpDown: Gpio.PUD_DOWN,
+    alert: true
+});
+button.glitchFilter(50000); // 10ms debounce (in microseconds)
 const streamBuffers = require('stream-buffers');
 const mqtt = require('mqtt');
 const loudness = require('loudness');
@@ -111,13 +117,8 @@ client.on('message', function (topic, message) {
 
 loadFile(filename);
 
-button.watch(function (err, value) {
-    if (err) {
-        log(`GPIO error: ${err.message}`);
-        return;
-    }
-
-    if (value === 1 && !playing){
+button.on('alert', function(level, tick) {
+    if (level === 1 && !playing) {
         log("Doorbell triggered, playing sound...");
         playing = true;
 
@@ -130,12 +131,11 @@ button.watch(function (err, value) {
 
         client.publish(MQTT_TOPIC_BUTTON_PRESS, 'Doorbell ringing!');
     }
-
 });
 
 function shutdown() {
     log('Exiting...');
-    button.unexport();
+    pigpio.terminate();
     client.end();
     process.exit(0);
 }

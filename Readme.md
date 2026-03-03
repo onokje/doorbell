@@ -16,13 +16,39 @@ sudo apt-get install -y nodejs
 node --version   # should print v22.x.x
 ```
 
+NOTE: This installation method of Node.js requires 64bit arm, so raspberry pi 3 or newer is required. For armv7/raspberry-pi 2 or older, install binary directly:
+
+```bash
+wget https://nodejs.org/dist/latest-v22.x/node-v22.?.?-linux-armv7l.tar.xz
+```
+(Replace ?.? with the latest version from: https://nodejs.org/dist/latest-v22.x/)
+
+Extract to /usr/local:
+
+```bash
+sudo tar -xJf node-v22.*-linux-armv7l.tar.xz -C /usr/local --strip-components=1
+```
+
+This installs:
+
+
+```
+/usr/local/bin/node
+/usr/local/bin/npm
+/usr/local/lib/node_modules
+```
+
+System-wide.
+
+
 ### 2. Install system dependencies
 
 ```bash
-sudo apt-get install -y libasound2-dev git
+sudo apt-get install -y libasound2-dev pigpio git
 ```
 
-`libasound2-dev` is required to compile the `speaker` audio backend.
+- `libasound2-dev` — required to compile the `speaker` audio backend
+- `pigpio` — GPIO hardware library required for button input
 
 ### 3. Create a dedicated user
 

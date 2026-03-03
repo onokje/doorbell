@@ -7,11 +7,9 @@ ExecStart=/usr/bin/node /opt/doorbell/index.js
 WorkingDirectory=/opt/doorbell
 Restart=on-failure
 RestartSec=5
-User=doorbell
 EnvironmentFile=/opt/doorbell/.env
 StandardOutput=journal
 StandardError=journal
-NoNewPrivileges=yes
 
 [Install]
 WantedBy=multi-user.target

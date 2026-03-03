@@ -50,26 +50,17 @@ sudo apt-get install -y libasound2-dev pigpio git
 - `libasound2-dev` — required to compile the `speaker` audio backend
 - `pigpio` — GPIO hardware library required for button input
 
-### 3. Create a dedicated user
-
-The service runs as an unprivileged `doorbell` user. It needs access to the GPIO and audio subsystems:
-
-```bash
-sudo useradd -r -s /usr/sbin/nologin doorbell
-sudo usermod -aG gpio,audio doorbell
-```
 
 ### 4. Deploy the application
 
 ```bash
 sudo mkdir /opt/doorbell
-sudo git clone https://github.com/your-user/doorbell.git /opt/doorbell
+sudo git clone https://github.com/onokje/doorbell.git /opt/doorbell
 # or copy the files manually:
 # sudo cp -r /path/to/doorbell/* /opt/doorbell/
 
 cd /opt/doorbell
 sudo npm install --omit=dev
-sudo chown -R doorbell:doorbell /opt/doorbell
 ```
 
 ### 5. Configure environment variables
